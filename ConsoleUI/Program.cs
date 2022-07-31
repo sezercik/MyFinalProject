@@ -1,11 +1,20 @@
 ﻿using Business.Concrete;
+using DataAccess.Concrete.EntityFramework;
 using DataAccess.Concrete.InMemory;
 using Entities.Concrete;
 
-ProductManager productManager = new ProductManager(new InMemoryProductDal());
 
-List<Product> products = productManager.GetAll();
-foreach (Product product in products)
+//SOLID
+//Open Closed principle
+ProductManager productManager = new ProductManager(new EfProductDal());
+
+//List<Product> products = productManager.GetAll();
+//foreach (Product product in products)
+//{
+// Console.WriteLine(product.ProductName);   
+//}
+
+foreach (Product product in productManager.GetAllByCategoryId(1))
 {
- Console.WriteLine(product.ProductName);   
+ Console.WriteLine(product.ProductName);
 }
