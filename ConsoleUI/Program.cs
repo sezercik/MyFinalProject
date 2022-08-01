@@ -6,7 +6,13 @@ using Entities.Concrete;
 
 //SOLID
 //Open Closed principle
-ProductManager productManager = new ProductManager(new EfProductDal());
+ProductTest();
+//CategoryTest();
+
+
+void ProductTest()
+{
+ ProductManager productManager = new ProductManager(new EfProductDal());
 
 //List<Product> products = productManager.GetAll();
 //foreach (Product product in products)
@@ -14,7 +20,17 @@ ProductManager productManager = new ProductManager(new EfProductDal());
 // Console.WriteLine(product.ProductName);   
 //}
 
-foreach (Product product in productManager.GetAllByCategoryId(1))
+ foreach (var product in productManager.GetProductDetails())
+ {
+  Console.WriteLine(product.ProductName + " / " + product.CategoryName);
+ }
+}
+
+void CategoryTest()
 {
- Console.WriteLine(product.ProductName);
+ CategoryManager categoryManager = new CategoryManager(new EfCategoryDal());
+ foreach (Category category in categoryManager.GetAll())
+ {
+  Console.WriteLine(category.CategoryName);
+ }
 }
