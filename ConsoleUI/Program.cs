@@ -14,16 +14,23 @@ void ProductTest()
 {
  ProductManager productManager = new ProductManager(new EfProductDal());
 
-//List<Product> products = productManager.GetAll();
-//foreach (Product product in products)
-//{
-// Console.WriteLine(product.ProductName);   
-//}
-
- foreach (var product in productManager.GetProductDetails())
- {
-  Console.WriteLine(product.ProductName + " / " + product.CategoryName);
- }
+    //List<Product> products = productManager.GetAll();
+    //foreach (Product product in products)
+    //{
+    // Console.WriteLine(product.ProductName);   
+    //}
+    var result = productManager.GetProductDetails();
+    if (result.Success)
+    {
+        foreach (var product in result.Data)
+        {
+            Console.WriteLine(product.ProductName + " / " + product.CategoryName);
+        }
+    }
+    else
+    {
+        Console.WriteLine(result.Message);
+    }
 }
 
 void CategoryTest()
