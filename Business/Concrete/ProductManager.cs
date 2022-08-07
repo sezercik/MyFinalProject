@@ -7,6 +7,8 @@ using Business.Abstract;
 using Business.BusinessAspects.Autofac;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Caching;
+using Core.Aspects.Autofac.Transaction;
 using Core.Aspects.Autofac.Validation;
 using Core.CrossCuttingConcerns.Validation;
 using Core.Utilities.Business;
@@ -27,18 +29,20 @@ namespace Business.Concrete
 
         public ProductManager(IProductDal productDal,ICategoryService categoryService)
         {
+            _productDal = productDal;
             _categoryService = categoryService;
         }
 
 
         [SecuredOperation("product.add,admin")]
         [ValidationAspect(typeof(ProductValidator))]
+        [CacheRemoveAspect("IProductService.Get")]
         public IResult Add(Product product)
         {
             //aynı isim de ürün eklenemez
             //Eğer mevcut kategori sayısı 15'i geçtiyse sisteme yeni ürün eklenemez
             IResult result = BusinessRules.Run(
-                 CheckIfProdcutCountOfCategoryCorrect(product.CategoryId),
+                 CheckIfProductCountOfCategoryCorrect(product.CategoryId),
                  CheckIfProductNameExists(product.ProductName),
                  CheckIfCategoryLimitExceded()
                  );
@@ -51,6 +55,7 @@ namespace Business.Concrete
             return new Result(true, Messages.ProductAdded);
         }
 
+        [CacheAspect] //key,value
         public IDataResult<List<Product>> GetAll()
         {
             //iş kodları
@@ -61,6 +66,7 @@ namespace Business.Concrete
             return new SuccessDataResult<List<Product>>(_productDal.GetAll(), Messages.ProductsListed);
         }
 
+        [CacheAspect]
         public IDataResult<List<Product>> GetAllByCategoryId(int id)
         {
             return new SuccessDataResult<List<Product>>(_productDal.GetAll(product => product.CategoryId == id));
@@ -71,6 +77,7 @@ namespace Business.Concrete
             return new SuccessDataResult<List<Product>>(_productDal.GetAll(p => p.UnitPrice >= min && p.UnitPrice <= max));
         }
 
+        [CacheAspect]
         public IDataResult<Product> GetById(int productID)
         {
             return new SuccessDataResult<Product>(_productDal.Get(p => p.ProductId == productID));
@@ -82,13 +89,15 @@ namespace Business.Concrete
         }
 
         [ValidationAspect(typeof(ProductValidator))]
+        [CacheRemoveAspect("IProductService.Get")]
         public IResult Update(Product product)
         {
             throw new NotImplementedException();
         }
 
-        private IResult CheckIfProdcutCountOfCategoryCorrect(int categoryId)
+        private IResult CheckIfProductCountOfCategoryCorrect(int categoryId)
         {
+            //Select count(*) from products where categoryId=1
             var result = _productDal.GetAll(p => p.CategoryId == categoryId).Count;
             if (result >= 15)
             {
@@ -115,5 +124,7 @@ namespace Business.Concrete
             }
             return new SuccessResult();
         }
+
+
     }
 }
