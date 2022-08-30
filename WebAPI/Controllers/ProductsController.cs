@@ -31,18 +31,32 @@ namespace WebAPI.Controllers
             }
             return BadRequest(result);
         }
-        [HttpGet("getallbycategoryid")]
-        public IActionResult GetAllByCategoryId(int id)
+        [HttpGet("getbycategory")]
+        public IActionResult GetAllByCategoryId(int categoryId)
         {
             //Swagger
             //Dependecy Chain
-            var result = _productService.GetAllByCategoryId(id);
+            var result = _productService.GetAllByCategoryId(categoryId);
             if (result.Success)
             {
                 return Ok(result);
             }
             return BadRequest(result);
         }
+
+        [HttpGet("getproductdetails")]
+        public IActionResult GetProductDetails()
+        {
+            //Swagger
+            //Dependecy Chain
+            var result = _productService.GetProductDetails();
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
+        }
+
 
         [HttpGet("getbyid")]
         public IActionResult GetById(int id)

@@ -20,6 +20,7 @@ var builder = WebApplication.CreateBuilder(args);
 //AOP
 //Autofac, Ninject, CastleWindsor, StructureMap, LightInject, DryInject --> IoC Container
 builder.Services.AddControllers();
+builder.Services.AddCors();
 
 
 var tokenOptions = builder.Configuration.GetSection("TokenOptions").Get<TokenOptions>();
@@ -44,6 +45,7 @@ builder.Services.AddDependencyResolvers(new ICoreModule[]
     new CoreModule()
 });
 
+
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 builder.Host.ConfigureContainer<ContainerBuilder>(builder =>
 {
@@ -64,6 +66,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors(builder=>builder.WithOrigins("http://localhost:4200").AllowAnyHeader());
+
 app.UseHttpsRedirection();
 
 app.UseRouting();
@@ -71,6 +75,10 @@ app.UseRouting();
 app.UseAuthentication();
 
 app.UseAuthorization();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
 
 app.MapControllers();
 
